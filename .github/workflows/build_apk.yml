@@ -77,14 +77,14 @@ jobs:
     - name: Fetch AndroidLibXrayLite tag (Si Cepat via unarto API)
       run: |
         # Mengambil tag rilis terbaru dari repo unarto sendiri
-        CURRENT_TAG=$(curl -s https://api.github.com/repos/unarto/AndroidLibXrayLite/releases/latest | jq -r .tag_name)
+        CURRENT_TAG=$(curl -s https://api.github.com/repos/unarto/Androidlibxraylitev26.1.23/releases/latest | jq -r .tag_name)
         echo "Current tag in unarto repo: $CURRENT_TAG"
         echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
 
     - name: Download libv2ray
       uses: robinraju/release-downloader@v1.12
       with:
-        repository: 'unarto/AndroidLibXrayLite'
+        repository: 'unarto/Androidlibxraylitev26.1.23'
         tag: ${{ env.CURRENT_TAG }}
         fileName: 'libv2ray.aar'
         out-file-path: app/libs/

@@ -193,66 +193,7 @@ fun DashboardScreen(viewModel: AppViewModel) {
                 }
             }
 
-            item(span = StaggeredGridItemSpan.FullLine) {
-                val activeProxy = viewModel.proxies.find { it.isSelected }
-                if (activeProxy != null) {
-                    Column(modifier = Modifier.padding(bottom = 12.dp)) {
-                        Text(
-                            text = "Active Proxy Server",
-                            modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 4.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f))
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(
-                                    text = activeProxy.name,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    maxLines = 1
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                    Text(text = activeProxy.type, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    Text(
-                                        text = activeProxy.latency, 
-                                        fontSize = 14.sp, 
-                                        fontWeight = FontWeight.Medium,
-                                        color = if (activeProxy.latency == "Timeout") Color(0xFFE57373) else MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.End,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    val clipboardManager = LocalClipboardManager.current
-                                    IconButton(onClick = { activeEditProxy = activeProxy }) {
-                                        Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
-                                    }
-                                    IconButton(onClick = { qrDialogProxy = activeProxy }) {
-                                        Icon(Icons.Default.QrCode, contentDescription = "QR Code", tint = MaterialTheme.colorScheme.primary)
-                                    }
-                                    IconButton(onClick = { 
-                                        clipboardManager.setText(AnnotatedString(XrayConfigGenerator.generateProxyUri(activeProxy)))
-                                        Toast.makeText(context, "Exported config to clipboard!", Toast.LENGTH_SHORT).show()
-                                    }) {
-                                        Icon(Icons.Default.ContentPaste, contentDescription = "Export Config", tint = MaterialTheme.colorScheme.primary)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+
 
             if (vpnStatus == SiCepatVpnService.VpnStatus.CONNECTED && connectionMode == SiCepatVpnService.ConnectionMode.PROXY_ONLY) {
                 item(span = StaggeredGridItemSpan.FullLine) {
