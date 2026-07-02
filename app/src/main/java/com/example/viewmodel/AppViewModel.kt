@@ -107,6 +107,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     var webdavIsBound by mutableStateOf(false)
     var recoveryStrategy by mutableStateOf("Compatible") // "Compatible" or "Override"
 
+    var hasAttemptedAutoConnect = false
+
     init {
         loadHysteriaConfig(application)
         loadShizukuConfig(application)

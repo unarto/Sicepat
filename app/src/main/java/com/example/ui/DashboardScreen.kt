@@ -70,7 +70,24 @@ fun DashboardScreen(viewModel: AppViewModel) {
         }
     }
 
-
+    LaunchedEffect(Unit) {
+        if (!viewModel.hasAttemptedAutoConnect) {
+            viewModel.hasAttemptedAutoConnect = true
+            val activeProxyName = com.example.util.PrefManager.getActiveProxyName(context)
+            if (activeProxyName.isNotEmpty() && vpnStatus == SiCepatVpnService.VpnStatus.DISCONNECTED) {
+                if (connectionMode == SiCepatVpnService.ConnectionMode.PROXY_ONLY) {
+                    val startIntent = Intent(context, SiCepatVpnService::class.java).apply { action = "START" }
+                    context.startService(startIntent)
+                } else {
+                    val vpnIntent = VpnService.prepare(context)
+                    if (vpnIntent == null) {
+                        val startIntent = Intent(context, SiCepatVpnService::class.java).apply { action = "START" }
+                        context.startService(startIntent)
+                    }
+                }
+            }
+        }
+    }
 
     if (showAddDialog) {
         AlertDialog(

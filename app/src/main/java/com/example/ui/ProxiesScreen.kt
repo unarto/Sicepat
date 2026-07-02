@@ -117,14 +117,7 @@ fun ProxiesScreen(viewModel: AppViewModel) {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (activeAddType != null) {
-            AddProxyScreen(
-                activeAddType = activeAddType!!,
-                currentProfileName = currentProfileName,
-                proxiesList = proxiesList,
-                onDismiss = { activeAddType = null }
-            )
-        } else if (activeEditProxy != null) {
+        if (activeEditProxy != null) {
             EditProxyScreen(
                 editingProxyInstance = activeEditProxy!!,
                 proxiesList = proxiesList,
@@ -153,7 +146,16 @@ fun ProxiesScreen(viewModel: AppViewModel) {
                         }
                     },
                     onAddTypeClick = { type ->
-                        activeAddType = type
+                        when (type.lowercase()) {
+                            "vmess" -> showVmessDialog = true
+                            "vless" -> showVlessDialog = true
+                            "trojan" -> showTrojanDialog = true
+                            "shadowsocks" -> showShadowsocksDialog = true
+                            "histeria2", "hysteria" -> showHysteria2Dialog = true
+                            "wireguard" -> showWireGuardDialog = true
+                            "socks", "socks5" -> showSocksDialog = true
+                            "http" -> showHttpDialog = true
+                        }
                     },
                     onDeleteInvalidClick = {
                         if (currentProfileName.isNotBlank() && currentProfileName != "All") {
@@ -381,8 +383,8 @@ fun ProxiesScreen(viewModel: AppViewModel) {
         if (showWireGuardDialog) {
             AddWireGuardDialog(
                 onDismiss = { showWireGuardDialog = false },
-                onSave = { name ->
-                    proxiesList.add(0, ProxyItem(name, "WireGuard", "Waiting", false, profileName = currentProfileName))
+                onSave = { name, fullConfig ->
+                    proxiesList.add(0, ProxyItem(name, "WireGuard", "Waiting", false, fullConfig = fullConfig, profileName = currentProfileName))
                     showWireGuardDialog = false
                 }
             )
@@ -391,8 +393,8 @@ fun ProxiesScreen(viewModel: AppViewModel) {
         if (showHysteria2Dialog) {
             AddHysteria2Dialog(
                 onDismiss = { showHysteria2Dialog = false },
-                onSave = { name ->
-                    proxiesList.add(0, ProxyItem(name, "Hysteria2", "Waiting", false, profileName = currentProfileName))
+                onSave = { name, fullConfig ->
+                    proxiesList.add(0, ProxyItem(name, "Hysteria2", "Waiting", false, fullConfig = fullConfig, profileName = currentProfileName))
                     showHysteria2Dialog = false
                 }
             )
@@ -460,124 +462,6 @@ fun ProxiesScreen(viewModel: AppViewModel) {
     }
 }
 
-@Composable
-fun AddProxyScreen(
-    activeAddType: String,
-    currentProfileName: String,
-    proxiesList: androidx.compose.runtime.snapshots.SnapshotStateList<ProxyItem>,
-    onDismiss: () -> Unit
-) {
-    var remarksText by remember { mutableStateOf("") }
-    var fullConfigText by remember { mutableStateOf("") }
-
-    val displayType = when (activeAddType) {
-        "vmess" -> "Vmess"
-        "vless" -> "Vless"
-        "trojan" -> "Trojan"
-        "histeria2", "hysteria" -> "Hysteria2"
-        "shadowsocks" -> "Shadowsocks"
-        "wireguard" -> "WireGuard"
-        "socks", "socks5" -> "Socks5"
-        "http" -> "HTTP"
-        else -> "Proxy"
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        // Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onDismiss) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Tambahkan $displayType",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        }
-
-        Card(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                OutlinedTextField(
-                    value = remarksText,
-                    onValueChange = { remarksText = it },
-                    label = { Text("Nama Server / Remarks") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-                
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = fullConfigText,
-                    onValueChange = { fullConfigText = it },
-                    label = { Text("Config URI (e.g. ${activeAddType}://...)") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    maxLines = 10
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Batal", color = MaterialTheme.colorScheme.primary)
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Button(
-                        onClick = {
-                            val name = if (remarksText.isNotBlank()) remarksText else "New $displayType Server"
-                            proxiesList.add(0, ProxyItem(
-                                name = name,
-                                type = displayType,
-                                latency = "Waiting",
-                                isSelected = false,
-                                profileName = currentProfileName,
-                                fullConfig = fullConfigText
-                            ))
-                            onDismiss()
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                    ) {
-                        Text("Simpan", color = MaterialTheme.colorScheme.onPrimary)
-                    }
-                }
-            }
-        }
-    }
-}
 
 data class ParsedProxyConfig(
     val remarks: String = "",
@@ -1696,7 +1580,7 @@ fun ProxiesHeader(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Tambahkan vmess", color = Color.White) },
+                            text = { Text("Add VMess", color = Color.White) },
                             leadingIcon = { Icon(Icons.Default.AddBox, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                             onClick = {
                                 showAddMenu = false
@@ -1704,7 +1588,7 @@ fun ProxiesHeader(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Tambahkan vless", color = Color.White) },
+                            text = { Text("Add VLESS", color = Color.White) },
                             leadingIcon = { Icon(Icons.Default.AddBox, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                             onClick = {
                                 showAddMenu = false
@@ -1712,7 +1596,7 @@ fun ProxiesHeader(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Tambahkan Trojan", color = Color.White) },
+                            text = { Text("Add Trojan", color = Color.White) },
                             leadingIcon = { Icon(Icons.Default.AddBox, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                             onClick = {
                                 showAddMenu = false
@@ -1720,7 +1604,7 @@ fun ProxiesHeader(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Tambahkan histeria2", color = Color.White) },
+                            text = { Text("Add Hysteria2", color = Color.White) },
                             leadingIcon = { Icon(Icons.Default.AddBox, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                             onClick = {
                                 showAddMenu = false
@@ -1728,7 +1612,7 @@ fun ProxiesHeader(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Tambahkan shadowshocks", color = Color.White) },
+                            text = { Text("Add Shadowsocks", color = Color.White) },
                             leadingIcon = { Icon(Icons.Default.AddBox, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                             onClick = {
                                 showAddMenu = false
@@ -1736,7 +1620,7 @@ fun ProxiesHeader(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Tambahkan pelindung kawat", color = Color.White) },
+                            text = { Text("Add Wireguard", color = Color.White) },
                             leadingIcon = { Icon(Icons.Default.AddBox, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                             onClick = {
                                 showAddMenu = false
@@ -1744,7 +1628,7 @@ fun ProxiesHeader(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Tambahkan kaus kaki", color = Color.White) },
+                            text = { Text("Add SOCKS", color = Color.White) },
                             leadingIcon = { Icon(Icons.Default.AddBox, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                             onClick = {
                                 showAddMenu = false
@@ -1752,7 +1636,7 @@ fun ProxiesHeader(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Tambahkan http", color = Color.White) },
+                            text = { Text("Add HTTP", color = Color.White) },
                             leadingIcon = { Icon(Icons.Default.AddBox, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                             onClick = {
                                 showAddMenu = false
@@ -1931,6 +1815,28 @@ fun ProxyCard(
                         fontWeight = FontWeight.Medium,
                         color = if (proxy.latency == "Timeout") Color(0xFFE57373) else if (proxy.isSelected || proxy.isGreen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary
                     )
+                }
+                
+                if (proxy.isSelected) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = onEdit) {
+                            Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
+                        }
+                        IconButton(onClick = { showQrDialog = true }) {
+                            Icon(Icons.Default.QrCode, contentDescription = "QR Code", tint = MaterialTheme.colorScheme.primary)
+                        }
+                        IconButton(onClick = { 
+                            clipboardManager.setText(AnnotatedString(XrayConfigGenerator.generateProxyUri(proxy)))
+                            Toast.makeText(context, "Exported config to clipboard!", Toast.LENGTH_SHORT).show()
+                        }) {
+                            Icon(Icons.Default.ContentPaste, contentDescription = "Export Config", tint = MaterialTheme.colorScheme.primary)
+                        }
+                    }
                 }
             }
 
@@ -2134,7 +2040,7 @@ fun ProxyCard(
 @Composable
 fun AddWireGuardDialog(
     onDismiss: () -> Unit,
-    onSave: (name: String) -> Unit
+    onSave: (name: String, fullConfig: String) -> Unit
 ) {
     var rawView by remember { mutableStateOf<android.view.View?>(null) }
     AlertDialog(
@@ -2163,7 +2069,11 @@ fun AddWireGuardDialog(
                         val etRemarks = view.findViewById<EditText>(R.id.et_remarks)
                         val remarksText = etRemarks?.text?.toString() ?: ""
                         val name = if (remarksText.isNotBlank()) remarksText else "New WireGuard Server"
-                        onSave(name)
+                        val address = view.findViewById<EditText>(R.id.et_address)?.text?.toString() ?: ""
+                        val portStr = view.findViewById<EditText>(R.id.et_port)?.text?.toString() ?: "51820"
+                        val port = portStr.toIntOrNull() ?: 51820
+                        val fullConfig = "wireguard://$address:$port#${java.net.URLEncoder.encode(name, "UTF-8")}"
+                        onSave(name, fullConfig)
                     } else {
                         onDismiss()
                     }
@@ -2186,7 +2096,7 @@ fun AddWireGuardDialog(
 @Composable
 fun AddHysteria2Dialog(
     onDismiss: () -> Unit,
-    onSave: (name: String) -> Unit
+    onSave: (name: String, fullConfig: String) -> Unit
 ) {
     var rawView by remember { mutableStateOf<android.view.View?>(null) }
     AlertDialog(
@@ -2235,7 +2145,24 @@ fun AddHysteria2Dialog(
                         val etRemarks = view.findViewById<EditText>(R.id.et_remarks)
                         val remarksText = etRemarks?.text?.toString() ?: ""
                         val name = if (remarksText.isNotBlank()) remarksText else "New Hysteria2 Server"
-                        onSave(name)
+                        val address = view.findViewById<EditText>(R.id.et_address)?.text?.toString() ?: ""
+                        val portStr = view.findViewById<EditText>(R.id.et_port)?.text?.toString() ?: "443"
+                        val port = portStr.toIntOrNull() ?: 443
+                        val password = view.findViewById<EditText>(R.id.et_id)?.text?.toString() ?: ""
+                        val obfsPassword = view.findViewById<EditText>(R.id.et_obfs_password)?.text?.toString() ?: ""
+                        val obfs = view.findViewById<EditText>(R.id.et_obfs)?.text?.toString() ?: ""
+                        val sni = view.findViewById<EditText>(R.id.et_sni)?.text?.toString() ?: ""
+                        val insecure = view.findViewById<android.widget.Spinner>(R.id.sp_allow_insecure)?.selectedItem?.toString()?.lowercase() == "true"
+                        
+                        val queryParams = mutableListOf<String>()
+                        if (sni.isNotBlank()) queryParams.add("sni=${java.net.URLEncoder.encode(sni, "UTF-8")}")
+                        if (insecure) queryParams.add("insecure=1")
+                        if (obfs.isNotBlank()) queryParams.add("obfs=${java.net.URLEncoder.encode(obfs, "UTF-8")}")
+                        if (obfsPassword.isNotBlank()) queryParams.add("obfs-password=${java.net.URLEncoder.encode(obfsPassword, "UTF-8")}")
+                        
+                        val queryStr = if (queryParams.isNotEmpty()) "?" + queryParams.joinToString("&") else ""
+                        val fullConfig = "hysteria2://$password@$address:$port$queryStr#${java.net.URLEncoder.encode(name, "UTF-8")}"
+                        onSave(name, fullConfig)
                     } else {
                         onDismiss()
                     }
@@ -2361,7 +2288,7 @@ fun AddVmessDialog(
                     if (view != null) {
                         val etRemarks = view.findViewById<EditText>(R.id.et_remarks)
                         val remarksText = etRemarks?.text?.toString() ?: ""
-                        val name = if (remarksText.isNotBlank()) remarksText else "New VMess Server"
+                        val name = if (remarksText.isNotBlank()) remarksText else "New Vmess Server"
 
                         val address = view.findViewById<EditText>(R.id.et_address)?.text?.toString() ?: ""
                         val portStr = view.findViewById<EditText>(R.id.et_port)?.text?.toString() ?: "443"
@@ -2743,5 +2670,6 @@ fun AddHttpDialog(
         shape = RoundedCornerShape(20.dp)
     )
 }
+
 
 
