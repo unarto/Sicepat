@@ -34,7 +34,7 @@ ln -s "$__dir/hev-socks5-tunnel-2.14.3" jni/hev-socks5-tunnel
     APP_PLATFORM=android-24 \
     NDK_LIBS_OUT="$TMPDIR/libs" \
     NDK_OUT="$TMPDIR/obj" \
-    "APP_CFLAGS=-O3 -DPKGNAME=com/example/service -DCLSNAME=HevSocks5Tunnel" \
+    "APP_CFLAGS=-O3 -DPKGNAME=com/example -DCLSNAME=hevsocks5tunnel" \
     "APP_LDFLAGS=-Wl,--build-id=none -Wl,--hash-style=gnu"
 
 mkdir -p "$__dir/libs"

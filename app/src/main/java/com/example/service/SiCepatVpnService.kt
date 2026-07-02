@@ -265,7 +265,7 @@ class SiCepatVpnService : VpnService() {
 
             serviceScope.launch(Dispatchers.IO) {
                 try {
-                    com.example.hevsocks5tunnel.TProxyStartService(configFile.absolutePath, fd)
+                    com.example.HevTunnelBridge.startService(configFile.absolutePath, fd)
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to start HevSocks5Tunnel: ${e.message}")
                 }
@@ -303,7 +303,7 @@ class SiCepatVpnService : VpnService() {
                 var failedHealthChecks = 0
                 
                 while (vpnThread?.isActive == true) {
-                    val stats = try { com.example.hevsocks5tunnel.TProxyGetStats() } catch (e: Exception) { null }
+                    val stats = try { com.example.HevTunnelBridge.getStats() } catch (e: Exception) { null }
                     var hasTraffic = false
                     
                     if (stats != null && stats.size >= 4) {
@@ -402,7 +402,7 @@ class SiCepatVpnService : VpnService() {
         // Restart JNI Tunnel
         if (_connectionMode.value == ConnectionMode.VPN) {
             try {
-                com.example.hevsocks5tunnel.TProxyStopService()
+                com.example.HevTunnelBridge.stopService()
             } catch (e: Exception) {}
 
             kotlinx.coroutines.delay(500)
@@ -415,7 +415,7 @@ class SiCepatVpnService : VpnService() {
                     val configFile = java.io.File(configDir, "hev-socks5-tunnel.yaml")
                     serviceScope.launch(kotlinx.coroutines.Dispatchers.IO) {
                         try {
-                            com.example.hevsocks5tunnel.TProxyStartService(configFile.absolutePath, fd)
+                            com.example.HevTunnelBridge.startService(configFile.absolutePath, fd)
                         } catch (e: Exception) {
                             Log.e(TAG, "Failed to start HevSocks5Tunnel during crash recovery: ${e.message}")
                         }
@@ -439,7 +439,7 @@ class SiCepatVpnService : VpnService() {
 
         // Stop hev-socks5-tunnel JNI
         try {
-            com.example.hevsocks5tunnel.TProxyStopService()
+            com.example.HevTunnelBridge.stopService()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to stop hev-socks5-tunnel", e)
         }

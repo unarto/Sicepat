@@ -30,7 +30,7 @@ SRCDIR := $(LOCAL_PATH)/src
 
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/build.mk
-LOCAL_MODULE    := hev-socks5-tunnel
+LOCAL_MODULE    := hevsocks5tunnel
 LOCAL_SRC_FILES := $(patsubst $(SRCDIR)/%,src/%,$(SRCFILES))
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/src \

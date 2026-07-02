@@ -9,7 +9,15 @@ class hevsocks5tunnel {
     
     companion object {
         init {
-            System.loadLibrary("hev-socks5-tunnel")
+            try {
+                System.loadLibrary("hevsocks5tunnel")
+            } catch (e: UnsatisfiedLinkError) {
+                try {
+                    System.loadLibrary("hev-socks5-tunnel")
+                } catch (e2: UnsatisfiedLinkError) {
+                    e2.printStackTrace()
+                }
+            }
         }
 
         /**
