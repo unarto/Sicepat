@@ -1,21 +1,45 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# HevSocks5Tunnel Bridge Configuration
 
-# Run and deploy your AI Studio app
+Dokumentasi ini menjelaskan konfigurasi `PKGNAME` dan `CLSNAME` yang digunakan sebagai jembatan penghubung JNI (Java Native Interface) untuk modul `hev-socks5-tunnel` di dalam aplikasi ini.
 
-This contains everything you need to run your app locally.
+## JNI Bridge Configuration
 
-View your app in AI Studio: https://ai.studio/apps/eb0d47e9-1279-4e3e-b87c-54647c29aaaf
+Ketika mengompilasi library `libhevsocks5tunnel.so`, compiler menggunakan parameter `APP_CFLAGS` untuk memetakan nama paket (package name) dan nama kelas (class name) agar sesuai dengan entry point di kode Kotlin/Java Android.
 
-## Run Locally
+Berikut adalah nilai parameter yang didefinisikan:
 
-**Prerequisites:**  [Android Studio](https://developer.android.com/studio)
+| Parameter | Nilai C/C++ | Nilai Kotlin (Android) | Keterangan |
+| :--- | :--- | :--- | :--- |
+| **PKGNAME** | `com/example` | `com.example` | Lokasi package jembatan JNI (menggunakan separator `/` pada C) |
+| **CLSNAME** | `hevsocks5tunnel` | `hevsocks5tunnel` | Nama kelas Kotlin yang mengekspos fungsi `external` |
 
+### Pemetaan Kelas Kotlin Lengkap:
+* **Package**: `package com.example`
+* **Class**: `class hevsocks5tunnel`
+* **Method Signatures**:
+  * `@JvmStatic external fun TProxyStartService(configPath: String, fd: Int)`
+  * `@JvmStatic external fun TProxyStopService()`
+  * `@JvmStatic external fun TProxyGetStats(): LongArray`
 
-1. Open Android Studio
-2. Select **Open** and choose the directory containing this project
-3. Allow Android Studio to fix any incompatibilities as it imports the project.
-4. Create a file named `.env` in the project directory and set `GEMINI_API_KEY` in that file to your Gemini API key (see `.env.example` for an example)
-5. Remove this line from the app's `build.gradle.kts` file: `signingConfig = signingConfigs.getByName("debugConfig")`
-6. Run the app on an emulator or physical device
+---
+
+## Implementasi Kompilasi (compile-hevtun.sh)
+
+Konfigurasi di atas dilewatkan saat proses kompilasi NDK melalui argumen `APP_CFLAGS` di skrip `compile-hevtun.sh`:
+
+```bash
+"$NDK_HOME/ndk-build" \
+    NDK_PROJECT_PATH=. \
+    APP_BUILD_SCRIPT=jni/Android.mk \
+    "APP_ABI=armeabi-v7a arm64-v8a x86 x86_64" \
+    APP_PLATFORM=android-24 \
+    NDK_LIBS_OUT="$TMPDIR/libs" \
+    NDK_OUT="$TMPDIR/obj" \
+    "APP_CFLAGS=-O3 -DPKGNAME=com/example -DCLSNAME=hevsocks5tunnel" \
+    "APP_LDFLAGS=-Wl,--build-id=none -Wl,--hash-style=gnu"
+```
+
+## Legacy Compatibility (Backup)
+Untuk mendukung integrasi lama, aplikasi juga mendeteksi kelas backward-compatibility berikut:
+* **Package**: `com.example.service`
+* **Class**: `HevSocks5Tunnel`

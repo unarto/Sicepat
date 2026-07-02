@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          fetch-depth: '0'
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -25,7 +28,17 @@ jobs:
 
       # Solusi Otomatis: Membuat ulang wrapper 9.3.1 yang bersih di Cloud
       - name: Setup Gradle Wrapper (v9.3.1)
-        run: gradle wrapper --gradle-version 9.3.1
+        run: |
+          mkdir -p gradle/wrapper
+          if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            echo "Gradle wrapper jar is missing. Generating..."
+            gradle wrapper --gradle-version 9.3.1 || {
+              echo "Gradle command failed. Downloading gradle-wrapper.jar directly..."
+              curl -Lo gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v9.3.1/gradle/wrapper/gradle-wrapper.jar
+            }
+          else
+            gradle wrapper --gradle-version 9.3.1
+          fi
 
       - name: Ensure gradlew is executable
         run: chmod +x gradlew
@@ -35,8 +48,17 @@ jobs:
           touch .env
           echo "MAPS_API_KEY=mock_key" >> .env
 
-      - name: Decode debug keystore
-        run: base64 -d debug.keystore.base64 > debug.keystore
+      - name: Detect and Setup Debug Keystore
+        run: |
+          if [ -f "debug.keystore" ]; then
+            echo "debug.keystore already exists."
+          elif [ -f "debug.keystore.base64" ]; then
+            echo "Decoding debug.keystore.base64..."
+            base64 -d debug.keystore.base64 > debug.keystore
+          else
+            echo "No debug keystore found! Generating a dummy debug keystore..."
+            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
 
       # Proses compile APK (Sesuai workflow yang kamu kirim)
       - name: Build Split Debug APKs
