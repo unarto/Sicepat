@@ -1,0 +1,8 @@
+{
+  "name": "Remix: SiCepat",
+  "description": "High-speed VPN app utilizing the Mihomo Clash Meta core for secure and private internet browsing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

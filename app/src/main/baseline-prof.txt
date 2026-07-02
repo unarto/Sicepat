@@ -1,0 +1,63 @@
+# Baseline Profile for SiCepat VPN App
+# Critical user journeys: startup, navigation, listing proxies, rendering screens.
+
+# MainActivity and App Entry Points
+Hcom/example/MainActivity;
+HSPLcom/example/MainActivity;->onCreate(Landroid/os/Bundle;)V
+Hcom/example/MainActivity;->setContent(Lkotlin/jvm/functions/Function2;)V
+
+# ViewModel and UI State
+Hcom/example/viewmodel/AppViewModel;
+Hcom/example/viewmodel/AppViewModel;->*
+Hcom/example/ui/ProxyItem;
+Hcom/example/ui/ProxyItem;->*
+
+# Composable Screens and helper functions
+Hcom/example/ui/ProxiesScreenKt;
+Hcom/example/ui/ProxiesScreenKt;->*
+Hcom/example/ui/DashboardScreenKt;
+Hcom/example/ui/DashboardScreenKt;->*
+Hcom/example/ui/ProfilesScreenKt;
+Hcom/example/ui/ProfilesScreenKt;->*
+Hcom/example/ui/ToolsScreenKt;
+Hcom/example/ui/ToolsScreenKt;->*
+Hcom/example/ui/RoutingSettingsScreenKt;
+Hcom/example/ui/RoutingSettingsScreenKt;->*
+
+# VPN Core background service and native tasks
+Hcom/example/service/SiCepatVpnService;
+Hcom/example/service/SiCepatVpnService;->*
+Hcom/example/service/XrayCore;
+Hcom/example/service/XrayCore;->*
+Hcom/example/hevsocks5tunnel;
+Hcom/example/hevsocks5tunnel;->*
+
+# UI Theme
+Hcom/example/ui/theme/ThemeKt;
+Hcom/example/ui/theme/ThemeKt;->*
+
+# Database & Repository (Room)
+Hcom/example/AppDatabase;
+Hcom/example/AppDatabase;->*
+Hcom/example/DiagnosticLog;
+Hcom/example/DiagnosticLog;->*
+Hcom/example/DiagnosticLogDao;
+Hcom/example/DiagnosticLogDao;->*
+Hcom/example/DiagnosticLogRepository;
+Hcom/example/DiagnosticLogRepository;->*
+
+# Jetpack Compose and Android system classes that handle layout, composition, and rendering
+Landroidx/compose/runtime/Composer;
+Landroidx/compose/runtime/ComposerImpl;
+Landroidx/compose/runtime/RecomposeScopeImpl;
+Landroidx/compose/runtime/CompositionLocal;
+Landroidx/compose/runtime/CompositionLocalProviderKt;
+Landroidx/compose/runtime/internal/ComposableLambdaImpl;
+Landroidx/compose/ui/platform/AndroidComposeView;
+Landroidx/compose/ui/node/LayoutNode;
+Landroidx/compose/ui/node/MeasureAndLayoutDelegate;
+Landroidx/compose/foundation/lazy/LazyListState;
+Landroidx/compose/foundation/lazy/grid/LazyGridState;
+Landroidx/compose/material3/ScaffoldKt;
+Landroidx/compose/material3/CardDefaults;
+Landroidx/compose/material3/Card;
