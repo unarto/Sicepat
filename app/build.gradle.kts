@@ -36,6 +36,7 @@ tasks.matching { it.name.startsWith("preBuild") }.configureEach {
 android {
   namespace = "com.example"
   compileSdk = 35
+  ndkVersion = "28.2.13676358"
 
   defaultConfig {
     applicationId = "com.aistudio.sicepat.real"
@@ -58,7 +59,7 @@ android {
 
   sourceSets {
     getByName("main") {
-      jniLibs.srcDirs("libs")
+      jniLibs.srcDir("libs")
     }
   }
 
